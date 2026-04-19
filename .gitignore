@@ -3,7 +3,8 @@ data/
 *.ipynb_checkpoints
 *.pyc
 /.ipynb_checkpoints
-results/
+results/*.txt
+*.csv
 figures/
 logs/
 /.vscode
