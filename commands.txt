@@ -1,0 +1,6 @@
+python train.py --model gat --epochs 500 --hidden 64 --heads 2 --num_layers 2
+
+python train.py --model gatv2 --epochs 500 --hidden 64 --heads 2 --num_layers 2
+
+python compare_attention.py --gat_ckpt   checkpoints/best_gat_arxiv.pt --gatv2_ckpt checkpoints/best_gatv2_arxiv.pt
+python compare_attention.py --gat_ckpt   checkpoints/best_gat_arxiv.pt --gatv2_ckpt checkpoints/best_gatv2_arxiv.pt --layer 1

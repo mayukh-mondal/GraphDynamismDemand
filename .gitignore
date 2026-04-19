@@ -1,0 +1,9 @@
+helper_notebooks/
+data/
+*.ipynb_checkpoints
+*.pyc
+/.ipynb_checkpoints
+results/
+figures/
+logs/
+/.vscode
