@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 CSV_DIR = Path("./attention_comparison_results/attention_tables")
-FIG_DIR = Path("./attention_comparison/figures")
+FIG_DIR = Path("./attention_comparison_results/figures")
 LAYERS  = [0, 1]
 
 
