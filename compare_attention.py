@@ -66,7 +66,7 @@ def parse_args():
     p.add_argument("--device",      type=str, default="auto")
     p.add_argument("--layer",       type=int, default=0)
     p.add_argument("--data_dir",    type=str, default="./data")
-    p.add_argument("--out_dir",     type=str, default="./results")
+    p.add_argument("--out_dir",     type=str, default="./attention_comparison_results")
     p.add_argument("--batch_edges",  type=int, default=500_000)
     p.add_argument("--sample_nodes", type=int, default=100_000,
                    help="Random induced subgraph size (0 = full graph, not recommended)")

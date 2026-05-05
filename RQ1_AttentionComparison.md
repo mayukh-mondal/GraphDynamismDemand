@@ -27,9 +27,9 @@ ogbn-arxiv  ──►  Train GAT   ──►  best_gat_arxiv.pt
                           │                          │
                           └──────────┬───────────────┘
                                      ▼
-                          export_attention_csv.py  ──►  results/attention_tables/
-                          summarizer.py            ──►  results/statistical_summary.txt
-                          visualize_results.py     ──►  figures/visualisation_layer{0,1}.pdf
+                          export_attention_csv.py  ──►  attention_comparison_results/attention_tables/
+                          summarizer.py            ──►  attention_comparison_results/statistical_summary.txt
+                          visualize_results.py     ──►  attention_comparison_results/figures/layer{0,1}/{distributions,degree_vs_node_metrics,head_scatter,head_boxplots}.png
 ```
 
 ### Step-by-step
@@ -40,17 +40,17 @@ ogbn-arxiv  ──►  Train GAT   ──►  best_gat_arxiv.pt
 2. **Extract attention** on **ogbl-citation2** (`compare_attention.py`).  
    Models trained on one citation graph are evaluated on a held-out citation graph to test generality.  
    A 100 000-node induced subgraph is sampled for tractability.  
-   Results are saved as `.pt` files in `results/`.
+   Results are saved as `.pt` files in `attention_comparison_results/`.
 
 3. **Export CSVs** (`export_attention_csv.py`).  
    Converts `.pt` tensors to per-edge and per-node CSV tables for downstream analysis.
 
 4. **Summarise** (`summarizer.py`).  
-   Computes distributional statistics over all metrics; writes `results/statistical_summary.txt`.
+   Computes distributional statistics over all metrics; writes `attention_comparison_results/statistical_summary.txt`.
 
 5. **Visualise** (`visualize_results.py`).  
    Generates histograms, degree-vs-metric scatter plots, per-head scatter plots, and boxplots;  
-   exported as multi-page PDFs in `figures/`.
+   saved as PNGs in `attention_comparison_results/figures/layer0/` and `attention_comparison_results/figures/layer1/` (4 files each).
 
 ---
 
@@ -193,7 +193,7 @@ Across both layers, the JSD is essentially zero for the overwhelming majority of
 | `compare_attention.py` | Attention extraction and metric computation |
 | `export_attention_csv.py` | Converts `.pt` results to CSV |
 | `summarizer.py` | Statistical summary over CSV tables |
-| `visualize_results.py` | PDF figure generation |
+| `visualize_results.py` | PNG figure generation (4 plots per layer into `figures/layer{0,1}/`) |
 | `commands.txt` | Reference CLI commands for training and attention comparison runs |
 
 ---
@@ -206,36 +206,36 @@ Across both layers, the JSD is essentially zero for the overwhelming majority of
 
 **Distribution histograms (edge cosine, node cosine, JSD, Spearman rho)**
 
-![Distribution histograms](figures/layer0/distributions.png)
+![Distribution histograms](attention_comparison_results/figures/layer0/distributions.png)
 
 **Degree vs. metric scatter plots**
 
-![Degree vs. metric scatter plots](figures/layer0/degree_vs_node_metrics.png)
+![Degree vs. metric scatter plots](attention_comparison_results/figures/layer0/degree_vs_node_metrics.png)
 
 **Per-head attention scatter plots**
 
-![Per-head attention scatter plots](figures/layer0/head_scatter.png)
+![Per-head attention scatter plots](attention_comparison_results/figures/layer0/head_scatter.png)
 
 **Node-level metric boxplots**
 
-![Node-level metric boxplots](figures/layer0/head_boxplots.png)
+![Node-level metric boxplots](attention_comparison_results/figures/layer0/head_boxplots.png)
 
 ### Layer 1 Visualisations
 
 **Distribution histograms (edge cosine, node cosine, JSD, Spearman rho)**
 
-![Distribution histograms](figures/layer1/distributions.png)
+![Distribution histograms](attention_comparison_results/figures/layer1/distributions.png)
 
 **Degree vs. metric scatter plots**
 
-![Degree vs. metric scatter plots](figures/layer1/degree_vs_node_metrics.png)
+![Degree vs. metric scatter plots](attention_comparison_results/figures/layer1/degree_vs_node_metrics.png)
 
 **Per-head attention scatter plots**
 
-![Per-head attention scatter plots](figures/layer1/head_scatter.png)
+![Per-head attention scatter plots](attention_comparison_results/figures/layer1/head_scatter.png)
 
 **Node-level metric boxplots**
 
-![Node-level metric boxplots](figures/layer1/head_boxplots.png)
+![Node-level metric boxplots](attention_comparison_results/figures/layer1/head_boxplots.png)
 
 ---

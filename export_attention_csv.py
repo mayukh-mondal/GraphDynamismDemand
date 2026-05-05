@@ -12,8 +12,8 @@ def _patched_load(*args, **kwargs):
     return _orig(*args, **kwargs)
 torch.load = _patched_load
 
-PT_DIR  = Path("./results")
-OUT_DIR = Path("./results/attention_tables")
+PT_DIR  = Path("./attention_comparison_results")
+OUT_DIR = Path("./attention_comparison_results/attention_tables")
 LAYERS  = [0, 1]
 
 

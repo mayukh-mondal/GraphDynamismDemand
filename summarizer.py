@@ -2,8 +2,8 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-CSV_DIR = Path("./results/attention_tables")
-OUT_FILE = Path("./results/statistical_summary.txt")
+CSV_DIR = Path("./attention_comparison_results/attention_tables")
+OUT_FILE = Path("./attention_comparison_results/statistical_summary.txt")
 LAYERS = [0, 1]
 
 

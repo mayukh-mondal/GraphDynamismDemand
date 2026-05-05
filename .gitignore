@@ -3,8 +3,9 @@ data/
 *.ipynb_checkpoints
 *.pyc
 /.ipynb_checkpoints
-results/*.txt
+attention_comparison_results/*.txt
+dd_results/*.txt
 *.csv
-figures/
+*.png
 logs/
 /.vscode

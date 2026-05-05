@@ -3,8 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-CSV_DIR = Path("./results/attention_tables")
-FIG_DIR = Path("./figures")
+CSV_DIR = Path("./attention_comparison_results/attention_tables")
+FIG_DIR = Path("./attention_comparison/figures")
 LAYERS  = [0, 1]
 
 
