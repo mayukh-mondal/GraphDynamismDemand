@@ -11,7 +11,7 @@ This is the primary target variable for RQ2 and RQ3.
 
 For each node $i$ with $\deg(i) \geq 3$, layer $l$, and head $h$:
 
-$$\rho_i^{(l,h)} = \operatorname{Spearman}\!\left(\alpha_{\text{GAT}}^{(l,h)}[N(i)],\; \alpha_{\text{GATv2}}^{(l,h)}[N(i)]\right)$$
+$$\rho_i^{(l,h)} = \text{Spearman}\!\left(\alpha_{\text{GAT}}^{(l,h)}[N(i)],\; \alpha_{\text{GATv2}}^{(l,h)}[N(i)]\right)$$
 
 where $N(i)$ is the set of neighbours of node $i$ (including the self-loop added by GATConv), and $\alpha^{(l,h)}[N(i)]$ is the vector of attention weights node $i$ assigns to its neighbours at layer $l$, head $h$.
 
@@ -29,19 +29,19 @@ This directly expands the general formula and avoids any ambiguity between per-h
 
 ### Step 3 — Per-node dynamism demand
 
-$$\operatorname{dd}(i) = 1 - \max\!\left(0,\; \bar{\rho}_i\right) \;\in\; [0, 1]$$
+$$\text{dd}(i) = 1 - \max\!\left(0,\; \bar{\rho}_i\right) \;\in\; [0, 1]$$
 
-Clamping at zero ensures anticorrelated rankings ($\bar\rho_i < 0$) do not push $\operatorname{dd}(i)$ above 1 — anticorrelation is treated as equally demanding as zero correlation.
+Clamping at zero ensures anticorrelated rankings ($\bar\rho_i < 0$) do not push $\text{dd}(i)$ above 1 — anticorrelation is treated as equally demanding as zero correlation.
 
 ### Step 4 — Graph-level DD (degree-weighted mean)
 
-$$\boxed{DD_{\text{proxy}}(G) = \frac{\displaystyle\sum_{\substack{i \in V \\ \deg(i)\,\geq\,3}} \deg(i)\cdot \operatorname{dd}(i)}{\displaystyle\sum_{\substack{i \in V \\ \deg(i)\,\geq\,3}} \deg(i)}}$$
+$$\boxed{DD_{\text{proxy}}(G) = \frac{\displaystyle\sum_{\substack{i \in V \\ \deg(i)\,\geq\,3}} \deg(i)\cdot \text{dd}(i)}{\displaystyle\sum_{\substack{i \in V \\ \deg(i)\,\geq\,3}} \deg(i)}}$$
 
 High-degree nodes receive greater weight because they have more reliable Spearman estimates and greater influence on message passing.
 
 ### Boundary conditions
 
-| Scenario | $\bar\rho_i$ | $\operatorname{dd}(i)$ | $DD_{\text{proxy}}$ |
+| Scenario | $\bar\rho_i$ | $\text{dd}(i)$ | $DD_{\text{proxy}}$ |
 | --- | --- | --- | --- |
 | GAT $\equiv$ GATv2 everywhere | $1.0$ | $0.0$ | **0.0** — static attention suffices |
 | Rankings fully uncorrelated | $0.0$ | $1.0$ | **1.0** — maximum dynamism demand |
@@ -74,7 +74,7 @@ Only pairs with $|C_{uv}| \geq 2$ contribute (minimum required for Spearman).
 
 ### Step 2 — Cross-query Spearman within GATv2
 
-$$\rho_{uv}^{(l,h)} = \operatorname{Spearman}\!\left(\alpha_{\text{GATv2}}^{(l,h)}[u,\, C_{uv}],\;\alpha_{\text{GATv2}}^{(l,h)}[v,\, C_{uv}]\right)$$
+$$\rho_{uv}^{(l,h)} = \text{Spearman}\!\left(\alpha_{\text{GATv2}}^{(l,h)}[u,\, C_{uv}],\;\alpha_{\text{GATv2}}^{(l,h)}[v,\, C_{uv}]\right)$$
 
 Per-pair average across layers and heads:
 

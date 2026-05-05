@@ -62,7 +62,7 @@ The full derivation is in [DD_formula.md](DD_formula.md). The key steps:
 
 For each node $i$ with $\deg(i) \geq 3$, layer $l$, and head $h$:
 
-$$\rho_i^{(l,h)} = \operatorname{Spearman}\!\left(\alpha_{\text{GAT}}^{(l,h)}[N(i)],\; \alpha_{\text{GATv2}}^{(l,h)}[N(i)]\right)$$
+$$\rho_i^{(l,h)} = \text{Spearman}\!\left(\alpha_{\text{GAT}}^{(l,h)}[N(i)],\; \alpha_{\text{GATv2}}^{(l,h)}[N(i)]\right)$$
 
 Nodes with $\deg(i) \leq 2$ are excluded because rank correlations over fewer than four values are statistically brittle (only $\pm 1$ or $0$ are achievable). With self-loops added by GATConv, `min_deg=3` corresponds to $\geq 2$ real neighbours.
 
@@ -76,13 +76,13 @@ $$\bar{\rho}_i = \frac{\rho_i^{(0,1)} + \rho_i^{(0,2)} + \rho_i^{(1,1)}}{3}$$
 
 **Step 3 — Per-node dynamism demand**
 
-$$\operatorname{dd}(i) = 1 - \max\!\left(0,\; \bar{\rho}_i\right) \;\in\; [0, 1]$$
+$$\text{dd}(i) = 1 - \max\!\left(0,\; \bar{\rho}_i\right) \;\in\; [0, 1]$$
 
 Anticorrelated rankings ($\bar\rho_i < 0$) are clamped to the same demand level as zero correlation.
 
 **Step 4 — Graph-level DD (degree-weighted mean)**
 
-$$\boxed{DD_{\text{proxy}}(G) = \frac{\displaystyle\sum_{\substack{i \in V \\ \deg(i)\,\geq\,3}} \deg(i)\cdot \operatorname{dd}(i)}{\displaystyle\sum_{\substack{i \in V \\ \deg(i)\,\geq\,3}} \deg(i)}}$$
+$$\boxed{DD_{\text{proxy}}(G) = \frac{\displaystyle\sum_{\substack{i \in V \\ \deg(i)\,\geq\,3}} \deg(i)\cdot \text{dd}(i)}{\displaystyle\sum_{\substack{i \in V \\ \deg(i)\,\geq\,3}} \deg(i)}}$$
 
 High-degree nodes receive greater weight because they have more reliable Spearman estimates and greater influence on message passing.
 
