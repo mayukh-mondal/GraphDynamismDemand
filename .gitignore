@@ -6,6 +6,6 @@ data/
 attention_comparison_results/*.txt
 dd_results/*.txt
 *.csv
-*.png
+# *.png
 logs/
 /.vscode
