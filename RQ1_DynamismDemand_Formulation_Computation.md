@@ -295,11 +295,11 @@ This is consistent with the structure of co-purchase graphs: products that frequ
 
 ### Cross-layer pattern
 
-Layer 1 has higher Spearman agreement (median $\rho = 0.97$) than layer 0 (median $\rho = 0.86$), replicating the pattern from RQ1 on ogbl-citation2. Dynamic attention differences arise at the feature-level (layer 0) but wash out as representations converge under the shared supervised signal.
+Layer 1 has higher Spearman agreement (median $\rho = 0.97$) than layer 0 (median $\rho = 0.86$), consistent with the pattern observed in the attention comparison (RQ1) on the same dataset. Dynamic attention differences arise at the feature level (layer 0) but wash out as representations converge under the shared supervised signal.
 
-### Comparison with ogbl-citation2 (RQ1)
+### Comparison with the attention comparison (RQ1, 100k sample)
 
-The citation2 analysis used cosine similarity (mean ≈ 0.997) and Spearman ρ (layer 0: 0.7046, layer 1: 0.7598) to characterise attention agreement. ogbn-products shows *higher* per-layer Spearman (0.78 / 0.86) — consistent with a lower DD_proxy. Co-purchase graphs have denser, more homogeneous neighbourhoods than citation graphs, offering even less structural incentive for query-dependent routing.
+The attention comparison (RQ1) used a 100k-node subgraph of ogbn-products and reported Spearman ρ over all nodes with deg > 1: layer 0 uniform mean = 0.700, layer 1 uniform mean = 0.771. The DD computation uses a 250k-node subgraph (seed = 42) and restricts to nodes with deg ≥ 3 (including the self-loop added by GATConv), giving layer 0 mean ρ = 0.780 and layer 1 mean ρ = 0.858. The higher values arise because the deg ≥ 3 filter excludes very-low-degree nodes, which tend to produce more extreme Spearman values and would otherwise dilute the mean. Both analyses agree on the qualitative conclusion: ogbn-products is a low-dynamism graph where GAT and GATv2 agree on neighbourhood rankings at both layers.
 
 ### What a high-DD graph would look like
 

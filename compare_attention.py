@@ -1,5 +1,5 @@
 """
-Load trained GAT and GATv2 checkpoints, run inference on ogbl-citation2, extract attention weights, and compute distance metrics between the two models' attention distributions.
+Load trained GAT and GATv2 checkpoints, run inference on ogbn-products, extract attention weights, and compute distance metrics between the two models' attention distributions.
 
 Metrics
 -------
@@ -21,7 +21,11 @@ Graph-level aggregation
 
 Notes on feature dimension:
   ogbn-arxiv    : 128-dim node features (Node2Vec embeddings)
-  ogbl-citation2: 128-dim node features (same)  →  no projection needed.
+  ogbn-products : 100-dim node features (bag-of-words)  →  zero-padded to 128 to match model in_channels.
+
+Notes on graph structure:
+  ogbn-products is an undirected graph; the OGB PyG loader already includes both directions,
+  so no reverse-edge augmentation is needed (unlike the directed ogbl-citation2).
 """
 
 import argparse
@@ -33,11 +37,11 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 
-from ogb.linkproppred import PygLinkPropPredDataset
+from ogb.nodeproppred import PygNodePropPredDataset
 from torch_geometric.utils import scatter, subgraph
 from models import GATNodeClassifier, GATv2NodeClassifier
 
-import ogb.linkproppred.dataset_pyg as ogb_pyg
+import ogb.nodeproppred.dataset_pyg as ogb_pyg
 
 _orig = torch.load
 @functools.wraps(_orig)
@@ -258,17 +262,16 @@ if __name__ == "__main__":
         log.info(f"ERROR: --layer {args.layer} out of range.")
         raise SystemExit(1)
 
-    log.info("Loading ogbl-citation2 …")
-    dataset    = PygLinkPropPredDataset(name="ogbl-citation2", root=args.data_dir)
-    data       = dataset[0]
+    log.info("Loading ogbn-products …")
+    dataset   = PygNodePropPredDataset(name="ogbn-products", root=args.data_dir)
+    data      = dataset[0]
 
-    row, col        = data.edge_index
-    data.edge_index = torch.cat([
-        torch.stack([row, col]),
-        torch.stack([col, row]),
-    ], dim=1)
+    # ogbn-products is undirected; the PyG loader already includes both directions.
+    num_nodes = data.num_nodes
 
-    num_nodes  = data.num_nodes
+    # Zero-pad 100-dim bag-of-words features to 128 to match model in_channels.
+    if data.x.size(1) < 128:
+        data.x = F.pad(data.x, (0, 128 - data.x.size(1)))
 
     if args.sample_nodes > 0 and args.sample_nodes < num_nodes:
         log.info(f"Sampling {args.sample_nodes:,} random nodes (induced subgraph) …")
@@ -324,7 +327,7 @@ if __name__ == "__main__":
     # Summary
     log.info("═" * 60)
     log.info("  ATTENTION METRICS  (GAT vs GATv2)")
-    log.info(f"  Dataset : ogbl-citation2  |  Layer : {layer}")
+    log.info(f"  Dataset : ogbn-products  |  Layer : {layer}")
     log.info("═" * 60)
 
     log.info("\n── Edge-level  (uniform mean) ──────────────────────────────")

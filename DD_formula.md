@@ -15,7 +15,7 @@ $$\rho_i^{(l,h)} = \text{Spearman}\!\left(\alpha_{\text{GAT}}^{(l,h)}[N(i)],\; \
 
 where $N(i)$ is the set of neighbours of node $i$ (including the self-loop added by GATConv), and $\alpha^{(l,h)}[N(i)]$ is the vector of attention weights node $i$ assigns to its neighbours at layer $l$, head $h$.
 
-Nodes with $\deg(i) \leq 2$ are excluded not because Spearman is undefined, but because rank correlations computed over very few values are statistically brittle — they can only take values such as $\pm 1$ or $0$ and carry no statistical power. We retain only nodes with $\deg(i) \geq 3$, which gives at least four ranked positions (three real neighbours plus the self-loop). Four ranks is the minimum at which Spearman can produce values other than $\pm 1$ or $0$, making the estimates meaningfully graded rather than binary.
+Nodes with $\deg(i) \leq 2$ are excluded because rank correlations over only two items can only return $\pm 1$ — degenerate and uninformative. (Degree is measured from the attention edge index, which already includes the self-loop added by GATConv; $\deg(i) = 2$ therefore means one real neighbour plus the self-loop.) We retain nodes with $\deg(i) \geq 3$, giving at least three ranked positions (two real neighbours plus the self-loop). With three items, Spearman takes four distinct values $\{-1,\,-0.5,\,0.5,\,1\}$, providing graded rather than degenerate estimates.
 
 ### Step 2 — Head-weighted aggregation across layers
 
@@ -55,7 +55,7 @@ $DD_{\text{proxy}}$ is sound under the assumption that **GAT learns the best sta
 - If all query nodes agree on neighbour rankings → static attention is optimal → GAT captures it → GATv2 does not deviate → $DD_{\text{proxy}} \approx 0$
 - If query nodes strongly disagree → static attention fails → GATv2 diverges from GAT → $DD_{\text{proxy}} \approx 1$
 
-The near-perfect cosine similarity ($\approx 0.999$) observed in RQ1 on ogbl-citation2 supports this assumption for well-trained models on citation graphs.
+On ogbn-products, per-layer cosine similarity between GAT and GATv2 attention vectors is $\approx 0.925$ (layer 0) and $\approx 0.985$ (layer 1), while $DD_{\text{proxy}} = 0.20$ (low). The low DD despite non-trivial vector divergence confirms that the proxy measures routing-order agreement (Spearman rank correlation) rather than raw vector similarity — the two signals are related but distinct, and it is the ranking signal that governs which neighbours influence each node's representation.
 
 ---
 
