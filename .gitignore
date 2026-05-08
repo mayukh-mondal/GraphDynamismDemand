@@ -1,11 +1,8 @@
-helper_notebooks/
-data/
+*.ipynb
 *.ipynb_checkpoints
-*.pyc
 /.ipynb_checkpoints
-attention_comparison_results/*.txt
-dd_results/*.txt
+*.pyc
 *.csv
-# *.png
-logs/
+*.txt
+*.log
 /.vscode
