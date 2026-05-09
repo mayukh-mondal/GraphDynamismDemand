@@ -2,10 +2,31 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 CSV_DIR = Path("./attention_tables")
 FIG_DIR = Path("./figures")
 LAYERS  = [0, 1]
+
+# ── LaTeX + font config ────────────────────────────────────────────────────────
+mpl.rcParams.update({
+    "text.usetex":          True,
+    "font.family":          "serif",
+    "font.serif":           ["Computer Modern Roman"],
+    "axes.titlesize":       16,
+    "axes.labelsize":       14,
+    "xtick.labelsize":      12,
+    "ytick.labelsize":      12,
+    "legend.fontsize":      13,
+    "legend.title_fontsize":14,
+    "figure.titlesize":     20,
+})
+
+# Font sizes for callouts
+SUPTITLE_SIZE  = 20   # figure-level title  (plot caption)
+ROW_TITLE_SIZE = 16   # per-axes title       (row/column caption)
+AXIS_LABEL_SIZE = 14  # x / y labels
+LEGEND_SIZE    = 13
 
 
 def safe_lim(lo, hi):
@@ -27,13 +48,13 @@ def plot_hist(ax, vals, color, xlabel, title):
     v = vals[np.isfinite(vals)]
     lo, hi = xlim_of(v)
     ax.hist(v, bins=100, color=color, edgecolor="none", alpha=0.85, density=True)
-    ax.axvline(v.mean(),      color="#dc2626", lw=1.5, label=f"mean={v.mean():.4f}")
-    ax.axvline(np.median(v),  color="#16a34a", lw=1.5, ls="--", label=f"median={np.median(v):.4f}")
+    ax.axvline(v.mean(),     color="#dc2626", lw=1.5, label=f"mean={v.mean():.4f}")
+    ax.axvline(np.median(v), color="#16a34a", lw=1.5, ls="--", label=f"median={np.median(v):.4f}")
     ax.set_xlim(lo, hi)
-    ax.set_xlabel(xlabel, fontsize=10)
-    ax.set_ylabel("Density", fontsize=10)
-    ax.set_title(title, fontsize=11)
-    ax.legend(fontsize=8)
+    ax.set_xlabel(xlabel, fontsize=AXIS_LABEL_SIZE)
+    ax.set_ylabel("Density", fontsize=AXIS_LABEL_SIZE)
+    ax.set_title(title, fontsize=ROW_TITLE_SIZE)
+    ax.legend(fontsize=LEGEND_SIZE)
 
 
 def plot_deg_scatter(ax, deg, metric, color, ylabel, title):
@@ -62,10 +83,10 @@ def plot_deg_scatter(ax, deg, metric, color, ylabel, title):
     ax.fill_between(centers, means - stds, means + stds, alpha=0.2, color=color)
     ax.set_xscale("log")
     ax.set_ylim(*ylim_of(met_v))
-    ax.set_xlabel("Node degree (log scale)", fontsize=10)
-    ax.set_ylabel(ylabel, fontsize=10)
-    ax.set_title(title, fontsize=11)
-    ax.legend(fontsize=8)
+    ax.set_xlabel("Node degree (log scale)", fontsize=AXIS_LABEL_SIZE)
+    ax.set_ylabel(ylabel, fontsize=AXIS_LABEL_SIZE)
+    ax.set_title(title, fontsize=ROW_TITLE_SIZE)
+    ax.legend(fontsize=LEGEND_SIZE)
 
 
 def plot_head_scatter(ax, gat_h, gatv2_h, h):
@@ -80,9 +101,9 @@ def plot_head_scatter(ax, gat_h, gatv2_h, h):
     ax.plot([lo, hi], [lo, hi], color="#dc2626", lw=1, ls="--")
     ax.set_xlim(lo, hi)
     ax.set_ylim(lo, hi)
-    ax.set_xlabel("alpha_gat", fontsize=9)
-    ax.set_ylabel("alpha_gatv2", fontsize=9)
-    ax.set_title(f"Head {h}", fontsize=10)
+    ax.set_xlabel("alpha\_gat",   fontsize=AXIS_LABEL_SIZE)
+    ax.set_ylabel("alpha\_gatv2", fontsize=AXIS_LABEL_SIZE)
+    ax.set_title(f"Head {h}",     fontsize=ROW_TITLE_SIZE)
 
 
 def export_layer(layer: int, out_dir: Path):
@@ -103,36 +124,48 @@ def export_layer(layer: int, out_dir: Path):
 
     plt.style.use("seaborn-v0_8-whitegrid")
 
+    # ── Figure 1 : Distributions ──────────────────────────────────────────────
     fig, axes = plt.subplots(3, 2, figsize=(14, 18))
-    fig.suptitle(f"Distributions · Layer {layer}", fontsize=13, fontweight="bold")
+    fig.suptitle(
+        f"Distributions · Layer {layer}",
+        fontsize=SUPTITLE_SIZE, fontweight="bold",
+    )
 
     plot_hist(axes[0, 0], edge_cos,        "#2563eb", "Edge Cosine Similarity", "Edge Cosine")
-    plot_hist(axes[0, 1], alpha_gat_all,   "#7c3aed", "Attention Weight",       "alpha_gat (all heads)")
-    plot_hist(axes[1, 0], alpha_gatv2_all, "#0891b2", "Attention Weight",       "alpha_gatv2 (all heads)")
+    plot_hist(axes[0, 1], alpha_gat_all,   "#7c3aed", "Attention Weight",       "alpha\_gat (all heads)")
+    plot_hist(axes[1, 0], alpha_gatv2_all, "#0891b2", "Attention Weight",       "alpha\_gatv2 (all heads)")
     plot_hist(axes[1, 1], node_cos,        "#7c3aed", "Node Cosine Similarity", "Node Cosine")
     plot_hist(axes[2, 0], node_jsd,        "#0891b2", "JSD (nats)",             "Node JSD")
-    plot_hist(axes[2, 1], node_spearman,   "#b45309", "Spearman ρ",             "Node Spearman ρ")
+    plot_hist(axes[2, 1], node_spearman,   "#b45309", r"Spearman $\rho$",       r"Node Spearman $\rho$")
 
     fig.tight_layout()
     fig.savefig(out_dir / "distributions.png", dpi=150)
     plt.close(fig)
 
+    # ── Figure 2 : Degree vs Node Metrics ────────────────────────────────────
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-    fig.suptitle(f"Degree vs Node Metrics · Layer {layer}", fontsize=13, fontweight="bold")
+    fig.suptitle(
+        f"Degree vs Node Metrics · Layer {layer}",
+        fontsize=SUPTITLE_SIZE, fontweight="bold",
+    )
 
     plot_deg_scatter(axes[0], deg, node_cos,      "#7c3aed", "Node Cosine",  "Degree vs Node Cosine")
     plot_deg_scatter(axes[1], deg, node_jsd,      "#0891b2", "Node JSD",     "Degree vs Node JSD")
-    plot_deg_scatter(axes[2], deg, node_spearman, "#b45309", "Spearman ρ",   "Degree vs Node Spearman ρ")
+    plot_deg_scatter(axes[2], deg, node_spearman, "#b45309", r"Spearman $\rho$", r"Degree vs Node Spearman $\rho$")
 
     fig.tight_layout()
     fig.savefig(out_dir / "degree_vs_node_metrics.png", dpi=150)
     plt.close(fig)
 
+    # ── Figure 3 : Head scatter ───────────────────────────────────────────────
     ncols = 4
     nrows = (H + ncols - 1) // ncols
     fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
     axes = np.array(axes).flatten()
-    fig.suptitle(f"alpha_gat vs alpha_gatv2 per Head · Layer {layer}", fontsize=13, fontweight="bold")
+    fig.suptitle(
+        f"alpha\_gat vs alpha\_gatv2 per Head · Layer {layer}",
+        fontsize=SUPTITLE_SIZE, fontweight="bold",
+    )
 
     for h in range(H):
         plot_head_scatter(axes[h], edf[gat_cols[h]].values, edf[gatv2_cols[h]].values, h)
@@ -143,24 +176,28 @@ def export_layer(layer: int, out_dir: Path):
     fig.savefig(out_dir / "head_scatter.png", dpi=150)
     plt.close(fig)
 
+    # ── Figure 4 : Head boxplots ──────────────────────────────────────────────
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    fig.suptitle(f"Per-head Attention Distributions · Layer {layer}", fontsize=13, fontweight="bold")
+    fig.suptitle(
+        f"Per-head Attention Distributions · Layer {layer}",
+        fontsize=SUPTITLE_SIZE, fontweight="bold",
+    )
 
     labels     = [f"h{h}" for h in range(H)]
     gat_data   = [edf[c].values for c in gat_cols]
     gatv2_data = [edf[c].values for c in gatv2_cols]
 
     for ax, data, color, median_color, title in [
-        (axes[0], gat_data,   "#93c5fd", "#1d4ed8", "alpha_gat per Head"),
-        (axes[1], gatv2_data, "#6ee7b7", "#065f46", "alpha_gatv2 per Head"),
+        (axes[0], gat_data,   "#93c5fd", "#1d4ed8", "alpha\_gat per Head"),
+        (axes[1], gatv2_data, "#6ee7b7", "#065f46", "alpha\_gatv2 per Head"),
     ]:
         ax.boxplot(data, tick_labels=labels, patch_artist=True, showfliers=False,
                    boxprops=dict(facecolor=color, alpha=0.7),
                    medianprops=dict(color=median_color, lw=2))
         ax.set_ylim(*ylim_of(np.concatenate(data)))
-        ax.set_xlabel("Head", fontsize=10)
-        ax.set_ylabel("Attention Weight", fontsize=10)
-        ax.set_title(title, fontsize=11)
+        ax.set_xlabel("Head", fontsize=AXIS_LABEL_SIZE)
+        ax.set_ylabel("Attention Weight", fontsize=AXIS_LABEL_SIZE)
+        ax.set_title(title, fontsize=ROW_TITLE_SIZE)
 
     fig.tight_layout()
     fig.savefig(out_dir / "head_boxplots.png", dpi=150)
