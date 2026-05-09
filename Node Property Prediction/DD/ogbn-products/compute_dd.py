@@ -40,7 +40,7 @@ import argparse
 import functools
 import logging
 from pathlib import Path
-
+from matplotlib import ticker
 import torch
 from torch import Tensor
 from torch_geometric.utils import scatter, subgraph
@@ -256,6 +256,8 @@ def compute_dd_proxy(gat_model, gatv2_model,
 
     return DD, dd, rho_bar, full_deg
 
+def make_1e4_formatter():
+    return ticker.FuncFormatter(lambda x, _: f"{x / 1e4:.0f}")
 
 def save_plots(dd: Tensor, rho_bar: Tensor, deg: Tensor,
                DD: float, dataset: str, sample_nodes: int, out_path: Path):
@@ -269,14 +271,17 @@ def save_plots(dd: Tensor, rho_bar: Tensor, deg: Tensor,
 
     axes[0].hist(valid_dd, bins=60, color="steelblue", edgecolor="none", alpha=0.85)
     axes[0].axvline(DD, color="crimson", linestyle="--", linewidth=1.5, label=f"DD={DD:.3f}")
-    axes[0].set_xlabel("dd(i)"); axes[0].set_ylabel("count")
+    axes[0].set_xlabel("dd(i)")
+    axes[0].set_ylabel(r"count  ($\times10^4$)")
+    axes[0].yaxis.set_major_formatter(make_1e4_formatter())
     axes[0].set_title("Per-node dynamism demand"); axes[0].legend()
 
     axes[1].hist(valid_rho, bins=60, color="darkorange", edgecolor="none", alpha=0.85)
     axes[1].axvline(valid_rho.mean(), color="navy", linestyle="--", linewidth=1.5,
                     label=f"mean={valid_rho.mean():.3f}")
     axes[1].set_xlabel(r"$\bar{\rho}_i$  (Spearman, GAT vs GATv2)")
-    axes[1].set_ylabel("count"); axes[1].set_title("Per-node cross-model Spearman rho")
+    axes[1].set_ylabel(r"count  ($\times10^4$)")
+    axes[1].yaxis.set_major_formatter(make_1e4_formatter())
     axes[1].legend()
 
     step = max(1, len(valid_dd) // 20_000)
